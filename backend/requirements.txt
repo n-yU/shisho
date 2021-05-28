@@ -1,0 +1,15 @@
+flask
+flask-login
+flask-cors
+elasticsearch
+pytest
+numpy
+scikit-learn
+gensim
+flake8
+autopep8
+requests
+mecab-python3
+tqdm
+neologdn
+PyYAML

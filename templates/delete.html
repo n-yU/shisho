@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="p-5 text-center bg-light" style="margin-top: 20px;">
+    {% if isbn10 %}
+    <h2 class="mb-4">本を削除する</h2>
+    <h4 class="mb-4">ISBN-10: {{ isbn10 }}</h4>
+    <h4 class="mb-4">タイトル: {{ book.title }}</h4>
+    <div class="pb-4"><img src="{{ book.cover }}" class="img-fluid shadow-2-strong" alt="" /></div>
+    <div class="d-flex justify-content-evenly align-items-end my-4">
+        <div>
+            <form method='POST' action='/delete/post'>
+                <input type="hidden" id="form1" class="form-control" name='isbn10' value='{{ isbn10 }}'>
+                <a class="btn btn-danger btn-rounded mx-2" style="font-size: 1rem" href="javascript:void(0)" onclick="this.parentNode.submit()">
+                    削除
+                </a>
+            </form>
+        </div>
+        <div>
+            <!-- 本ページに戻す -->
+            <a href="/book/{{ isbn10 }}" class="btn btn-lg btn-outline-primary btn-rounded mx-2"
+                style="font-size: 1.5rem">
+                戻る
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <!-- 本ページの削除ボタンを経由しないアクセス -->
+    <h2 class="mb-4">不正な操作です</h2>
+    <div class="d-flex justify-content-evenly align-items-end my-4">
+        <div class=>
+            <a href="/" class="btn btn-outline-primary btn-rounded mx-2"
+                style="font-size: 1.5rem">
+                トップに戻る
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

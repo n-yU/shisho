@@ -1,0 +1,27 @@
+/* カスタムCSS */
+
+/* フォント変更 */
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@400&display=swap');
+
+:root{
+    --font-family-sans-serif: "M PLUS 1p", sans-serif;
+    --font-family-monospace: "M PLUS 1p", sans-serif;
+}
+
+body {
+    font-family: "M PLUS 1p", sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "M PLUS 1p", sans-serif;
+}
+
+/* フォント変更ここまで */
+
+/* 表紙画像未取得書籍用 */
+.card-img-overlay {
+    padding: 0.75rem 2.5rem;
+    top: calc(30% - 0.5rem);
+    text-align: center;
+    font-weight: bold;
+}

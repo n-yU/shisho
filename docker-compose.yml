@@ -1,0 +1,41 @@
+version: '3.0'
+
+services:
+    elasticsearch:
+        build: ./elasticsearch
+        container_name: elasticsearch
+        environment:
+            - discovery.type=single-node
+            - cluster.name=elasticsearch
+            - bootstrap.memory_lock=true
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        ports:
+            - 9200:9200
+            - 9300:9300
+        volumes:
+            - ./elasticsearch:/usr/share/elasticsearch/data
+        networks:
+            - esnet
+            
+    python3:
+        build: ./backend
+        container_name: python3
+        links:
+            - elasticsearch
+        ports:
+            - "5000:5000"
+        tty: true
+        environment:
+            TZ: Asia/Tokyo
+        volumes:
+            - .:/projects
+        # command: flask run --host 0.0.0.0 --port 5000
+        networks:
+            - esnet
+
+networks:
+    esnet:

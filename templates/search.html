@@ -1,0 +1,145 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container-fluid">
+    <div class="p-5 text-center" style="margin-top: 20px;">
+        <h3 class="mb-4">{{ search_title }}</h3>
+        <!-- 検索ボックス -->
+        <div class="col-md-6 offset-md-3 mb-3">
+            <form action='/search' , method='GET' class="d-flex justify-content-center">
+                <div class="form-outline w-100">
+                    <input type="search" id="form1" class="form-control" name="q" value="{{ q }}" />
+                    <label class="form-label" for="form1">タイトル・著者・出版社・キーワード</label>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 表示数変更バー -->
+        <div class="col-sm-3 offset-sm-9 col-4 offset-8 mb-3">
+            <form action='/search' method='GET'>
+                <label for="customRange3" class="form-label">表示数</label>
+                <div class="range">
+                    <input type="hidden" id="form1" class="form-control" name='q' value='{{ q }}'>
+                    <input type="range" class="form-range" min="6" max="60" step="6" id="customRange3"
+                        value="{{ display }}" name="d">
+                </div>
+                <button type="submit" class="btn btn-primary mb-4" data-mdb-ripple-color="dark">
+                    変更
+                </button>
+            </form>
+        </div>
+
+        <!-- 検索ヒット書籍一覧 -->
+        {% if result %}
+        <!-- ヒット書籍あり -->
+        <div class="row align-items-center bg-light px-2 py-4">
+            {% for book in result %}
+            <div class="col-md-2 col-sm-4 col-6 mb-5">
+                <div class="mb-3">
+                    {% if book.cover %}
+                    <!-- 表紙画像あり -->
+                    <a class="ripple" href="/book/{{ book.isbn10 }}">
+                        <img src="{{ book.cover }}" class="img-fluid shadow-2-strong" alt="" />
+                    </a>
+                    {% else %}
+                    <!-- 表紙画像なし -->
+                    <a class="card bg-light" href="/book/{{ book.isbn10 }}">
+                        <img src="../static/img/book.png" class="img-fluid" alt="" />
+                        <div class="card-img-overlay" style="background-color: transparent;">
+                            <p>{{ book.title }}</p>
+                            <p>{{ book.authors.split(' ')[0] }}
+                                {% if book.authors.split(' ')|length > 2 %}
+                                ...
+                                {% endif %}
+                            </p>
+                            <p>{{ book.publisher }}</p>
+                        </div>
+                    </a>
+                    {% endif %}
+                </div>
+                <!-- 表紙画像下部に書籍タイトル表示 -->
+                <div style="font-size:1rem;">
+                    {{ book.title }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- ヒット書籍なし -->
+        <div type="mb-3">該当する書籍は見つかりませんでした</div>
+        {% endif %}
+    </div>
+    
+    <!-- ページネーション -->
+    <div class="p-4 mb-4 text-center">
+        <div class="d-flex justify-content-center mb-4">
+            <nav aria-label="...">
+                <ul class="pagination pagination-lg pagination-circle">
+                    <!-- 各ページボタンに検索KW，ページ番号，表示数のデータを埋め込む -> GETリクエストのパラメータとする -->
+                    {% if page > 1 %}
+                    <!-- 2ページ目以降 -> 前ページ遷移ボタン表示 -->
+                    <li class="page-item">
+                        <form method='GET' action='/search'>
+                            <input type="hidden" id="form1" class="form-control" name='q' value='{{ q }}'>
+                            <input type="hidden" id="form1" class="form-control" name='p' value='{{ page - 1 }}'>
+                            <input type="hidden" id="form1" class="form-control" name='d' value='{{ display }}'>
+                            <a class="page-link" tabindex="-1" aria-disabled="true" href="javascript:void(0)"
+                                onclick="this.parentNode.submit()">
+                                前へ
+                            </a>
+                        </form>
+                    </li>
+                    {% endif %}
+
+                    <!-- ページボタン -->
+                    {% for p in range(1, n_page + 1) %}
+                    {% if p == page %}
+                    <!-- 現在ページを強調表示 -->
+                    <li class="page-item active" aria-current="page">
+                        <form method='GET' action='/search'>
+                            <input type="hidden" id="form1" class="form-control" name='q' value='{{ q }}'>
+                            <input type="hidden" id="form1" class="form-control" name='p' value='{{ page }}'>
+                            <input type="hidden" id="form1" class="form-control" name='d' value='{{ display }}'>
+                            <a class="page-link" href="javascript:void(0)" onclick="this.parentNode.submit()">{{
+                                page }}
+                                <span class="visually-hidden">(current)</span>
+                            </a>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li class="page-item">
+                        <form method='GET' action='/search'>
+                            <input type="hidden" id="form1" class="form-control" name='q' value='{{ q }}'>
+                            <input type="hidden" id="form1" class="form-control" name='p' value='{{ p }}'>
+                            <input type="hidden" id="form1" class="form-control" name='d' value='{{ display }}'>
+                            <a class="page-link" href="javascript:void(0)" onclick="this.parentNode.submit()">{{ p
+                                }}</a>
+                        </form>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    <!-- 最終ページより前 -> 次ページ遷移ボタン表示  -->
+                    {% if page < n_page %} <li class="page-item">
+                        <form method='GET' action='/search'>
+                            <input type="hidden" id="form1" class="form-control" name='q' value='{{ q }}'>
+                            <input type="hidden" id="form1" class="form-control" name='p' value='{{ page + 1 }}'>
+                            <input type="hidden" id="form1" class="form-control" name='d' value='{{ display }}'>
+                            <a class="page-link" href="javascript:void(0)" onclick="this.parentNode.submit()">
+                                次へ
+                            </a>
+                        </form>
+                        </li>
+                        {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

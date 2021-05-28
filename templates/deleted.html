@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="p-5 text-center bg-light" style="margin-top: 20px;">
+    {% if isbn10 %}
+    <h2 class="mb-4">削除完了</h2>
+    <h4 class="mb-4">ISBN-10: {{ isbn10 }}</h4>
+    <h4 class="mb-4">タイトル: {{ book_title }}</h4>
+    <div class="d-flex justify-content-evenly align-items-end my-4">
+        <div class=>
+            <a href="/" class="btn btn-outline-primary btn-rounded mx-2" style="font-size: 1.5rem">
+                トップに戻る
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

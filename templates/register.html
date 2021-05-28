@@ -1,0 +1,105 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="p-5 text-center bg-light" style="margin-top: 20px;">
+    <h2 class="mb-4">本を登録する</h2>
+    <h4 class="mb-4">1. ISBN-10で検索</h4>
+    <form class="d-flex justify-content-center mb-4" action='/register' method='POST'>
+        <div class="form-outline w-auto">
+            <input type="search" id="form1" class="form-control" name='isbn10'
+                value='{% if isbn10 %}{{ isbn10 }}{% endif %}' />
+            <label class="form-label" for="form1">ISBN-10</label>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </form>
+
+    <!-- oepnBDリクエスト後に表示 -->
+    {% if result %}
+    <h4 class="mb-4">2. 情報確認</h4>
+    <div class="row">
+        {% if book_info and book_info.cover %}
+        <!-- 表示画像あり -->
+        <div class="col-md-3 offset-md-1 p-1">
+            <img src="{{ book_info.cover }}" class="img-fluid shadow-2-strong" alt="" />
+        </div>
+        {% else %}
+        <!-- 表紙画像なし or 書籍情報取得失敗 -->
+        <div class="col-md-3 offset-md-1 p-4">
+            <span class="border p-4" style="display: block">表紙画像なし</span>
+        </div>
+        {% endif %}
+
+        <!-- 書籍情報 -->
+        <div class="col-md-7 py-4">
+            <table class="table">
+                <tbody>
+                    <!-- openBDリクエスト結果表示 -->
+                    <tr>
+                        <th scope="row" style="width: 20%">結果</th>
+                        <td>
+                            {% if result == 'OK' %}検索結果が見つかりました
+                            {% elif result == 'FAILED' %}書籍情報取得サーバーに何らかの問題が発生しています
+                            {% elif result == 'NOT FOUND' %}指定したISBN-10に該当する書籍は見つかりません
+                            {% else %}不明なエラーです
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% if book_info %}
+                    <!-- 書籍情報取得成功時 -->
+                    <tr>
+                        <th scope="row">ISBN-10</th>
+                        <td>{% if book_info.isbn10 %}{{ book_info.isbn10 }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">タイトル</th>
+                        <td>{% if book_info.title %}{{ book_info.title }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Amazon</th>
+                        <td>
+                            <a href="{{ book_info.amazon }}" target="_blank" rel="noopener noreferrer">
+                                {{ book_info.amazon }}
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">著者</th>
+                        <td>{% if book_info.authors %}{{ book_info.authors }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">出版社</th>
+                        <td>{% if book_info.publisher %}{{ book_info.publisher }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">出版日</th>
+                        <td>{% if book_info.pubdate %}{{ book_info.pubdate }}{% endif %}</td>
+                    </tr>
+                    <!-- <tr>
+                        <th scope="row">説明</th>
+                        <td>{% if book_info.description %}{{ book_info.description }}{% endif %}</td>
+                    </tr> -->
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if book_info %}
+    <!-- 書籍情報取得に限り登録ボタン表示 -->
+    <div class="d-flex justify-content-center mb-4">
+        <form action='/register/post' , method='POST'>
+            <input type="hidden" id="form1" class="form-control" name='isbn10'
+                value='{% if isbn10 %}{{ isbn10 }}{% endif %}'>
+            <button type="submit" class="btn btn-outline-primary btn-rounded mb-4" data-mdb-ripple-color="dark"
+                style="font-size: 1.25rem">3. 登録！</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

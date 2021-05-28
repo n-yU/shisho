@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block content %}
+<!-- 詳細検索機能追加予定 -->
+
+<div class="container-fluid mb-4">
+    <div class="p-5 text-center bg-light" style="margin-top: 20px;">
+        <!-- 簡易検索 -->
+        <h3 class="mb-4">本を探す</h3>
+        <div class='row'>
+            <div class="col-md-8 offset-md-2 mb-4">
+                <form action='/search' , method='GET' class="d-flex justify-content-center">
+                    <div class="form-outline w-100">
+                        <input type="search" id="form1" class="form-control" name="q" />
+                        <label class="form-label" for="form1">タイトル・著者・出版社・キーワード</label>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

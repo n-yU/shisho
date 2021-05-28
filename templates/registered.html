@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="p-5 text-center bg-light" style="margin-top: 20px;">
+    {% if book_info %}
+    <h2 class="mb-4">登録完了</h2>
+    <h4 class="mb-4">{{ book_info.title }}</h4>
+    <h4 class="mb-4">ISBN-10: {{ isbn10 }}</h4>
+    <div class="d-flex flex-column justify-content-center">
+        {% if book_info.cover %}
+        <!-- 表紙画像あり -->
+        <div class="mb-4">
+            <img src="{{ book_info.cover }}" class="img-fluid shadow-2-strong" alt="" />
+        </div>
+        {% else %}
+        <!-- 表紙画像なし -->
+        <div class="p-4">
+            <span class="border p-4" style="display: block">表紙画像なし</span>
+        </div>
+        {% endif %}
+    </div>
+    <!-- 次の遷移 -->
+    <div class="d-flex justify-content-center my-4">
+        <div class=>
+            <a href="/register" class="btn btn-outline-primary btn-rounded mx-2" style="font-size: 1.25rem">
+                他にも登録する
+            </a>
+        </div>
+        <div>
+            <a href="/" class="btn btn-outline-dark btn-rounded mx-2" style="font-size: 1.25rem">
+                トップに戻る
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <!-- 登録確認ページの登録ボタン以外からのPOST -->
+    <h2 class="mb-4">登録失敗</h2>
+    <div class="d-flex justify-content-center flex-column mb-4">
+        <div class="mb-3">
+            <p>書籍情報取得に失敗しました．登録ページからもう一度やり直して下さい．</p>
+        </div>
+        <div>
+            <a href="/register" class="btn btn-outline-dark btn-rounded" style="font-size: 1.25rem">
+                登録ページに戻る
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

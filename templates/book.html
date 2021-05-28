@@ -1,0 +1,131 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="p-5 text-center bg-light" style="margin-top: 20px;">
+    <div class="row">
+        <!-- 表紙画像 -->
+        {% if book and book.cover %}
+        <!-- 表紙画像あり -->
+        <div class="col-md-3 offset-md-1 p-1">
+            <img src="{{ book.cover }}" class="img-fluid shadow-2-strong" alt="" />
+        </div>
+        {% else %}
+        <!-- 表紙画像なし -->
+        <div class="col-md-3 offset-md-1 p-4">
+            <span class="border p-4" style="display: block">表紙画像なし</span>
+        </div>
+        {% endif %}
+
+        <!-- 書籍基本情報 -->
+        <div class="col-md-7 py-3">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <th scope="row">タイトル</th>
+                        <td style="font-size:1.25rem">{% if book.title %}{{ book.title }}{% endif %}</td>
+                    </tr>
+                    <!-- D2Vモデルを活用したカテゴリ自動推定機能実装予定 -->
+                    <tr>
+                        <th scope="row">カテゴリ</th>
+                        <td>テスト</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">ISBN-10</th>
+                        <td>{{ isbn10 }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">著者</th>
+                        <td>{% if book.authors %}{{ book.authors }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">出版社</th>
+                        <td>{% if book.publisher %}{{ book.publisher }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">出版日</th>
+                        <td>{% if book.pubdate %}{{ book.pubdate }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" style="width: 20%">Amazon</th>
+                        <td>
+                            {% if book.amazon %}
+                            <!-- 新しいタブで対応する書籍のAmazon商品ページを開く -->
+                            <a href="{{ book.amazon }}" target="_blank" rel="noopener noreferrer">
+                                {{ book.amazon }}
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 書籍管理メニュー -->
+        <div class="col-md-3 offset-md-1 mt-4">
+            <div class="d-grid gap-2 col-6 mx-auto">
+                <!-- 借りる・返すはユーザ認証機能実装以降 -->
+                <button type="button" class="my-2 btn btn-lg btn-primary" style="font-size: 1.25rem;">借りる</button>
+                <button type="button" class="my-2 btn btn-lg btn-warning" style="font-size: 1.25rem;">返す</button>
+                <a href="/delete?isbn10={{ isbn10 }}" class="my-2 btn btn-lg btn-danger"
+                    style="font-size: 1.25rem;">削除</a>
+            </div>
+        </div>
+        
+        <!-- 書籍推薦 -->
+        <div class="col-md-7 my-3 bg-light">
+            {% if sim_books %}
+            <!-- 非パーソナライズ推薦（類似書籍） -->
+            <div class="row mt-4 align-items-center">
+                <div class="col-md-12 text-left mb-3">
+                    <h3>似ている本</h3>
+                </div>
+                {% for sb in sim_books %}
+                <div class="col-sm-2 mb-5 col-4">
+                    {% if sb.cover %}
+                    <!-- 表紙画像あり -->
+                    <a class="ripple" href="/book/{{ sb.isbn10 }}">
+                        <img src="{{ sb.cover }}" class="img-fluid shadow-2-strong" alt="" />
+                    </a>
+                    {% else %}
+                    <!-- 表紙画像なし -->
+                    <a class="card bg-light" href="/book/{{ sb.isbn10 }}">
+                        <img src="../static/img/book.png" class="img-fluid" alt="" />
+                        <div class="card-img-overlay" style="padding: 0.5rem 1rem;">
+                            <p style="font-size: 0.5rem;">{{ sb.title }}</p>
+                        </div>
+                    </a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- パーソナライズ推薦（未実装 <- 提案システム導入予定） -->
+            <div class="row mt-4 align-items-center bg-light">
+                <div class="col-md-12 text-left mb-3">
+                    <h3>あなたにオススメ（準備中）</h3>
+                </div>
+                {% for i in range(6) %}
+                <div class="col-sm-2 mb-5 col-4">
+                    {% if book.cover %}
+                    <!-- 表紙画像あり -->
+                    <a class="ripple" href="/book/{{ book.isbn10 }}">
+                        <img src="{{ book.cover }}" class="img-fluid shadow-2-strong" alt="" />
+                    </a>
+                    {% else %}
+                    <!-- 表紙画像なし -->
+                    <a class="card bg-light" href="/book/{{ book.isbn10 }}">
+                        <img src="../static/img/book.png" class="img-fluid" alt="" />
+                        <div class="card-img-overlay" style="padding: 0.5rem 1rem;">
+                            <p style="font-size: 0.5rem;">{{ book.title }}</p>
+                        </div>
+                    </a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
