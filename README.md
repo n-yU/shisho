@@ -13,8 +13,20 @@
 - 提案システム[梛木+, 2020]を活用したパーソナライズ推薦機能を実装予定です．
     - ただし，書籍（アイテム）の分散表現構築にはItem2Vec[Barkan+, 2016]ではなくDoc2Vecを使用しています．
 
-<!-- START doctoc -->
-<!-- END doctoc -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [📷 イメージ](#-%E3%82%A4%E3%83%A1%E3%83%BC%E3%82%B8)
+  - [トップページ](#%E3%83%88%E3%83%83%E3%83%97%E3%83%9A%E3%83%BC%E3%82%B8)
+  - [書籍個別ページ](#%E6%9B%B8%E7%B1%8D%E5%80%8B%E5%88%A5%E3%83%9A%E3%83%BC%E3%82%B8)
+- [🔍 環境](#-%E7%92%B0%E5%A2%83)
+- [📂 ディレクトリ構成](#-%E3%83%87%E3%82%A3%E3%83%AC%E3%82%AF%E3%83%88%E3%83%AA%E6%A7%8B%E6%88%90)
+- [🚀 セットアップ](#-%E3%82%BB%E3%83%83%E3%83%88%E3%82%A2%E3%83%83%E3%83%97)
+- [📚 参考](#-%E5%8F%82%E8%80%83)
+- [☎️ お問い合わせ](#-%E3%81%8A%E5%95%8F%E3%81%84%E5%90%88%E3%82%8F%E3%81%9B)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 
 ## 📷 イメージ
