@@ -40,7 +40,7 @@ def get_config() -> Dict[str, Any]:
 
 config = get_config()   # 司書設定
 # MeCab設定: NEologd（MeCab用システム辞書）を使った分かち書き
-mecab = MeCab.Tagger('-Ochasen -d /usr/lib/aarch64-linux-gnu/mecab/dic/mecab-ipadic-neologd')
+mecab = MeCab.Tagger('-Ochasen -r /etc/mecabrc -d /usr/lib/aarch64-linux-gnu/mecab/dic/mecab-ipadic-neologd')
 # Doc2Vecモデル読み込み（パスが存在しない -> 未訓練状態）
 d2v = Doc2VecWrapper(model_path=Path('/projects/model/d2v.model'))
 app = Flask(__name__)   # Flaskインスタンスをappという名前で生成
@@ -251,8 +251,12 @@ def book(isbn10=None):
 
     if n_book >= 10:
         # 10冊以上 -> D2Vモデル構築済み -> 非パーソナライズ推薦（類似書籍取得）
-        sim_books_isbn10 = d2v.get_similar_books(isbn10=isbn10, topn=6, verbose=False)  # 類似書籍ISBN-10コード
-        sim_books = [es.get_source(index='book', id=sb[0]) for sb in sim_books_isbn10]  # 類似書籍情報取得
+        try:
+            sim_books_isbn10 = d2v.get_similar_books(isbn10=isbn10, topn=6, verbose=False)  # 類似書籍ISBN-10コード
+            sim_books = [es.get_source(index='book', id=sb[0]) for sb in sim_books_isbn10]  # 類似書籍情報取得
+        except KeyError:
+            # 分散表現未構築（モデル再構築前） -> 非パーソナライズ推薦キャンセル
+            sim_books = None
     else:
         sim_books = None
 

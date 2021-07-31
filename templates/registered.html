@@ -4,7 +4,7 @@
 <div class="p-5 text-center bg-light" style="margin-top: 20px;">
     {% if book_info %}
     <h2 class="mb-4">登録完了</h2>
-    <h4 class="mb-4">{{ book_info.title }}</h4>
+    <h4 class="mb-4"><a href="/book/{{ isbn10 }}">{{ book_info.title }}</a></h4>
     <h4 class="mb-4">ISBN-10: {{ isbn10 }}</h4>
     <div class="d-flex flex-column justify-content-center">
         {% if book_info.cover %}
