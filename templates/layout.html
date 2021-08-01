@@ -38,7 +38,7 @@
                         <li class="nav-item"><a class="nav-link" href="/shelf/1">本棚</a></li>
                         <li class="nav-item"><a class="nav-link" href="/explore">検索</a></li>
                         <li class="nav-item"><a class="nav-link" href="/register">登録</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/user">ユーザ一覧</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/users">ユーザ一覧</a></li>
                     </ul>
                 </div>
                 <!-- Collapsible wrapper -->
@@ -53,9 +53,10 @@
                         aria-labelledby="navbarDropdownMenuLink">
                         <li><span class="dropdown-item">ログイン中 (ユーザID: {{ current_user.uId }})</span></li>
                         <li><hr class="dropdown-divider" /></li>
-                        <li><a class="dropdown-item" href="#">マイページ</a></li>
-                        <li><a class="dropdown-item" href="#">設定</a></li>
-                        <li><a class="dropdown-item" href="./logout">ログアウト</a></li>
+                        <li><a class="dropdown-item" href="/mypage">マイページ</a></li>
+                        <li><a class="dropdown-item" href="/history">閲覧履歴</a></li>
+                        <li><a class="dropdown-item" href="/option">設定</a></li>
+                        <li><a class="dropdown-item" href="/logout">ログアウト</a></li>
                     </ul>
                 </div>
                 <!-- Right elements -->

@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container-fluid">
+    <!-- デバッグ用 -->
+    <!-- <p class="note note-info">{{ user_history }}</p> -->
+
+    <div class="p-5 text-center" style="margin-top: 20px;">
+        <h3 class="mb-4">書籍情報 閲覧履歴（直近30冊）</h3>
+        <!-- 直近閲覧書籍一覧（最大30冊） -->
+        {% if user_history %}
+        <!-- 閲覧履歴あり -->
+        <div class="row align-items-center bg-light px-2 py-4">
+            {% for log in user_history %}
+            <div class="col-md-2 col-sm-4 col-6 mb-5">
+                <div class="mb-3">
+                    {% if log.book.cover %}
+                    <!-- 表紙画像あり -->
+                    <a class="ripple" href="/book/{{ log.bId }}">
+                        <img src="{{ log.book.cover }}" class="img-fluid shadow-2-strong" alt="">
+                    </a>
+                    
+                    {% else %}
+                     <!-- 表紙画像なし -->
+                    <a class="card bg-light" href="/book/{{ log.bId }}">
+                        <img src="../static/img/book.png" class="img-fluid" alt="">
+                        <div class="card-img-overlay" style="background-color: transparent;">
+                            <p>{{ log.book.title }}</p>
+                            <p>{{ log.book.authors.split(' ')[0] }}
+                                {% if log.book.authors.split(' ')|length > 2 %}
+                                ...
+                                {% endif %}
+                            </p>
+                            <p>{{ log.book.publisher }}</p>
+                        </div>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- 閲覧履歴なし -->
+        <div type="mb-3">閲覧した書籍はありません</div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

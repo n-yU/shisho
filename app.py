@@ -7,12 +7,12 @@ import os
 
 from flask import Flask, render_template, request, redirect, url_for
 from flask_wtf.csrf import CSRFProtect
-from flask_login import LoginManager, login_required, login_user, logout_user
+from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from flask_bcrypt import Bcrypt
 
 from backend.openbd import OpenBD
 from backend.doc2vecwrapper import Doc2VecWrapper
-from backend.db import LoginUser
+from backend.db import LoginUser, record_history, get_user_history
 from config import get_config
 
 
@@ -126,6 +126,36 @@ def login():
     else:
         title = get_title('ログイン')
         return render_template('login.html', shishosan=config['shishosan'], title=title, error='不明なエラーです')
+
+
+@app.route("/history")
+@login_required
+def history():
+    # "GET /history" -> "history.html"のレンダリング
+    title = get_title('閲覧履歴')
+    user_history = get_user_history(user=current_user)
+    # 表示する閲覧履歴の最大冊数は30冊
+    hisotry_max_size, unique_user_history, bIds_set = 30, [], set()
+
+    # 最新順（タイムスタンプ降順）取得 -> 重複履歴除外
+    es = Elasticsearch('elasticsearch')
+    for lId, log in sorted(user_history.items(), reverse=True):
+        if len(unique_user_history) == hisotry_max_size:
+            break
+        if log['bId'] in bIds_set:
+            # 時系列順で後に閲覧した書籍 -> 除外
+            continue
+
+        bIds_set.add(log['bId'])
+        unique_user_history.append(log)
+        unique_user_history[-1]['book'] = es.get_source(index='book', id=log['bId'])    # 書籍情報取得
+    es.close()
+
+    # 閲覧書籍0冊 -> None
+    if len(user_history) == 0:
+        unique_user_history = None
+
+    return render_template('history.html', shishosan=config['shishosan'], title=title, user_history=unique_user_history)
 
 
 @app.route("/logout")
@@ -331,6 +361,8 @@ def book(isbn10=None):
         sim_books = None
 
     es.close()
+
+    record_history(user=current_user, bId=isbn10)   # 書籍閲覧履歴記録
     return render_template('book.html', shishosan=config['shishosan'], title=title, isbn10=isbn10, book=book, sim_books=sim_books)
 
 
