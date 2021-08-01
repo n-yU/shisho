@@ -2,6 +2,7 @@ version: '3.0'
 
 services:
     elasticsearch:
+        # Elasticsearch
         build: ./elasticsearch
         container_name: elasticsearch
         environment:
@@ -20,12 +21,33 @@ services:
             - ./elasticsearch:/usr/share/elasticsearch/data
         networks:
             - esnet
+
+    mysql:
+        # MySQL（ユーザ，閲覧履歴）
+        image: mysql:5.7
+        container_name: mysql
+        platform: linux/x86_64
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: app
+            MYSQL_USER: test
+            MYSQL_PASSWORD: test
+            TZ: 'Asia/Tokyo'
+        volumes:
+            - ./db/data:/var/lib/mysql 
+            - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
+            - ./db/sql:/docker-entrypoint-initdb.d
+        command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+        networks:
+            - esnet
             
     python3:
+        # Flask（+推薦システム）
         build: ./backend
         container_name: python3
         links:
             - elasticsearch
+            - mysql
         ports:
             - "5000:5000"
         tty: true
@@ -33,7 +55,6 @@ services:
             TZ: Asia/Tokyo
         volumes:
             - .:/projects
-        # command: flask run --host 0.0.0.0 --port 5000
         networks:
             - esnet
 

@@ -33,6 +33,18 @@
 - [Jinja2の使い方がわかるとFlaskを用いた開発がよりスマートになる](https://qiita.com/oliva/items/7ae5de21307d101b4759)
 - [ウェブアプリケーションフレームワーク Flask を使ってみる](https://qiita.com/ynakayama/items/2cc0b1d3cf1a2da612e4)
 - [【Flask】Jinja2の制御構文(if, for in)でクライアントサイドを柔軟に簡素化する](https://tanuhack.com/jinja2-if-for/)
+- [[ Python ] flask-loginでログイン認証を実装してみた](https://outputable.com/post/flask-login/)
+- [flask-login - Qiita](https://qiita.com/tigerwest1009/items/003f8aac71768d1be879)
+- [Python + Flask を使ったWebアプリ作成④（ログイン認証編）](https://mmtomitomimm.blogspot.com/2019/03/4-python.html)
+- [Flask-Loginの使い方 - Qiita](https://qiita.com/msrks/items/d9c327dd81749ec01d1d)
+
+# SQL
+- [M1 MacでDockerのMySQLコンテナが立ち上がらない問題の解消法](https://ichi-station.com/docker-mysql-for-m1-mac/)
+- [MySQLをDocker(docker-compose)で立ててみた](https://outputable.com/post/mysql-on-docker/)
+- [docker-composeとMySQL公式イメージで簡単に開発環境用DBを作る](https://qiita.com/K_ichi/items/e8826c300e797b90e40f)
+- [SQLAlchemy入門 ORM その4 リレーションとJOIN | Python学習講座](https://www.python.ambitious-engineer.com/archives/1579)
+- [SQLAlchemyの基本的な使い方 - Qiita](https://qiita.com/ariku/items/75799665acd09520bed2)
+- [SQLAlchemyのSession生成方法 - Qiita](https://qiita.com/tosizo/items/86d3c60a4bb70eb1656e)
 
 ## Front-end
 主にBootstrapです．
@@ -46,6 +58,8 @@
 - [Bootstrap4 Flex(フレックス)ユーティリティの使い方を徹底解説](https://webst8.com/blog/bootstrap4-flex/)
 - [Bootstrap4のクラスを使って 画像の上に文字を重ねる方法](https://infoteck-life.com/a0336-bs4-image-overlay/)
 - [aタグをPOSTにする](https://qiita.com/horikeso/items/cceb42be04e2b6d1d5a6)
+- [Login page template - Free Bootstrap template](https://mdbootstrap.com/freebies/login-page/)
+- [Font Awesomeの色とサイズを変える方法](https://qiita.com/mzmz__02/items/aaff1d615900cf7d346c)
 
 ## Doc2Vec
 - [[gensim]Doc2Vecの使い方](https://qiita.com/asian373asian/items/1be1bec7f2297b8326cf)
@@ -56,3 +70,5 @@
 ## Others
 - [著作権ケーススタディ / 日本児童文芸家協会](http://www.jidoubungei.jp/cn9/pg78565.html)
 - [ノートアイコン1 | アイコン素材ダウンロードサイト「icooon-mono」 | 商用利用可能なアイコン素材が無料(フリー)ダウンロードできるサイト](https://icooon-mono.com/12957-%e3%83%8e%e3%83%bc%e3%83%88%e3%82%a2%e3%82%a4%e3%82%b3%e3%83%b31/)
+- [Pythonを使ってランダムな文字列を生成 - Qiita](https://qiita.com/Scstechr/items/c3b2eb291f7c5b81902a)
+- [.gitignoreを後から設定し、git管理から除外する方法 - Qiita](https://qiita.com/yutosa3/items/25ab031c8061e8c9a4c4)

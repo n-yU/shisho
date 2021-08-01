@@ -1,13 +1,20 @@
 from logging import getLogger, StreamHandler, DEBUG, Formatter
-from typing import Dict, Any
 from math import ceil
 from pathlib import Path
-from flask import Flask, render_template, request
 from elasticsearch import Elasticsearch
+import MeCab
+import os
+
+from flask import Flask, render_template, request, redirect, url_for
+from flask_wtf.csrf import CSRFProtect
+from flask_login import LoginManager, login_required, login_user, logout_user
+from flask_bcrypt import Bcrypt
+
 from backend.openbd import OpenBD
 from backend.doc2vecwrapper import Doc2VecWrapper
-import MeCab
-import yaml
+from backend.db import LoginUser
+from config import get_config
+
 
 # ロガー設定
 logger = getLogger(__name__)
@@ -19,31 +26,32 @@ logger.propagate = False
 handler.setFormatter(Formatter('[shisho] %(message)s'))
 
 
-def get_config() -> Dict[str, Any]:
-    """司書設定ファイル（yml形式）読み込み
-    Returns:
-        Dict[str, Any]: 司書設定
-    """
-    config_path = Path('./config/config.yml')
-
-    try:
-        with open(config_path) as f:
-            conf = yaml.safe_load(f)
-    except Exception as e:
-        logger.error('コンフィグの読み込みに失敗しました')
-        logger.error('フォーマットに問題がある可能性があります')
-        logger.error(e)
-        exit()
-
-    return conf
-
-
 config = get_config()   # 司書設定
 # MeCab設定: NEologd（MeCab用システム辞書）を使った分かち書き
 mecab = MeCab.Tagger('-Ochasen -r /etc/mecabrc -d /usr/lib/aarch64-linux-gnu/mecab/dic/mecab-ipadic-neologd')
 # Doc2Vecモデル読み込み（パスが存在しない -> 未訓練状態）
 d2v = Doc2VecWrapper(model_path=Path('/projects/model/d2v.model'))
+
+login_manager = LoginManager()
 app = Flask(__name__)   # Flaskインスタンスをappという名前で生成
+login_manager.init_app(app)
+login_manager.login_view = 'login'          # ログインページ
+app.config['SECRET_KEY'] = os.urandom(24)   # セッション情報暗号化
+csrf = CSRFProtect(app)                     # flask-wtfによるCSRF対策
+bcrypt = Bcrypt(app)                        # flask-bcryptパスワードハッシュ化
+
+
+@login_manager.user_loader
+def load_user(uId: str) -> LoginUser:
+    """認証ユーザの呼び出し方定義
+
+    Args:
+        uId (str): ユーザID
+
+    Returns:
+        LoginUser: ログインユーザ
+    """
+    return LoginUser.query.filter(LoginUser.uId == uId).one_or_none()
 
 
 def get_title(page_name: str) -> str:
@@ -60,6 +68,7 @@ def get_title(page_name: str) -> str:
 
 
 @app.route('/')
+@login_required
 def index():
     # "GET /" -> "index.html"のレンダリング
     title = get_title('トップ')
@@ -72,17 +81,71 @@ def index():
     es.close()
 
     picked_books = [sr['_source'] for sr in response]   # ピックアップ書籍
-    return render_template('index.html', title=title, picked_books=picked_books)
+    return render_template('index.html', shishosan=config['shishosan'], title=title, picked_books=picked_books)
+
+
+@app.route('/login', methods=['GET'])
+def login_form():
+    # "GET /login" -> レンダリング: "login.html"
+    title = get_title('ログイン')
+    return render_template('login.html', shishosan=config['shishosan'], title=title)
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    # "POST /login" -> ログイン試行
+    input_uId = request.form.get('uId', '')  # 入力ユーザID
+    user = load_user(uId=input_uId)         # 入力ユーザIDに対応するユーザ（存在しない -> None）
+
+    if input_uId == '':
+        # ユーザID未入力
+        title = get_title('ログイン')
+        return render_template('login.html', shishosan=config['shishosan'], title=title, error='ユーザIDが未入力です')
+    elif not user:
+        # 存在しないユーザID
+        title = get_title('ログイン')
+        return render_template('login.html', shishosan=config['shishosan'], title=title, error='指定したユーザIDは未登録です')
+    else:
+        pass
+
+    input_password = request.form.get('password', '')   # 入力パスワード
+    valid_pass = bcrypt.check_password_hash(user.password, input_password)  # パスワード確認（一致でTrue）
+    if valid_pass:
+        # パスワード一致 -> ログイン
+        login_user(user, remember=(True if request.form.get('rmm') else False))
+        # return render_template(shishosan=config['shishosan'], 'mypage.html')
+        return redirect(url_for('index'))   # TODO: マイページへの遷移
+    elif input_password == '':
+        # パスワード未入力
+        title = get_title('ログイン')
+        return render_template('login.html', shishosan=config['shishosan'], title=title, error='パスワードが未入力です')
+    elif not valid_pass:
+        # パスワード不一致
+        title = get_title('ログイン')
+        return render_template('login.html', shishosan=config['shishosan'], title=title, error='パスワードが異なります')
+    else:
+        title = get_title('ログイン')
+        return render_template('login.html', shishosan=config['shishosan'], title=title, error='不明なエラーです')
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    # "GET /logout" -> ログアウト処理
+    logout_user()
+    return redirect(url_for('login'))
 
 
 @app.route('/register')
+@login_required
 def register_check():
     # "GET /register" -> "register.html"のレンダリング
     title = get_title('登録確認')
-    return render_template('register.html', title=title)
+    return render_template('register.html', shishosan=config['shishosan'], title=title)
 
 
 @app.route('/register', methods=['POST'])
+@login_required
 def register_inquire():
     # "POST /register" -> "register.html"のレンダリング（リクエスト結果付与）
     title = get_title('書籍問い合わせ結果')
@@ -93,13 +156,14 @@ def register_inquire():
     if result == 'OK':
         # 書籍情報取得成功 -> 書籍基本情報送信
         book_info = book.get_std_info()  # 書籍基本情報
-        return render_template('register.html', title=title, isbn10=isbn10, result=result, book_info=book_info)
+        return render_template('register.html', shishosan=config['shishosan'], title=title, isbn10=isbn10, result=result, book_info=book_info)
     else:
         # 書籍情報取得失敗 -> リクエスト結果のみ送信
-        return render_template('register.html', title=title, isbn10=isbn10, result=result)
+        return render_template('register.html', shishosan=config['shishosan'], title=title, isbn10=isbn10, result=result)
 
 
 @app.route('/register/post', methods=['GET', 'POST'])
+@login_required
 def register_post():
     # "POST /register/post" -> "registered.html"のレンダリング
     title = get_title('登録完了')
@@ -121,10 +185,11 @@ def register_post():
         d2v = Doc2VecWrapper(model_path=Path('/projects/model/d2v.model'), initialize=True)
         d2v.train()
 
-    return render_template('registered.html', title=title, isbn10=isbn10, book_info=book_info)
+    return render_template('registered.html', shishosan=config['shishosan'], title=title, isbn10=isbn10, book_info=book_info)
 
 
 @app.route('/delete')
+@login_required
 def delete_inquire():
     # "GET /delete" -> "delete.html"のレンダリング
     if request.args.get('isbn10'):
@@ -137,14 +202,15 @@ def delete_inquire():
         book = es.get_source(index='book', id=isbn10)
         es.close()
 
-        return render_template('delete.html', title=title, isbn10=isbn10, book=book)
+        return render_template('delete.html', shishosan=config['shishosan'], title=title, isbn10=isbn10, book=book)
     else:
         # 本ページの削除ボタンを経由しないアクセス
         title = get_title('削除不可')
-        return render_template('delete.html', title=title)
+        return render_template('delete.html', shishosan=config['shishosan'], title=title)
 
 
 @app.route('/delete/post', methods=['GET', 'POST'])
+@login_required
 def delete_post():
     # "POST /delete/post" -> "deleted.html"のレンダリング
     title = get_title('削除完了')
@@ -163,10 +229,11 @@ def delete_post():
     d2v = Doc2VecWrapper(model_path=Path('/projects/model/d2v.model'), initialize=True)
     d2v.train()
 
-    return render_template('deleted.html', title=title, isbn10=isbn10, book_title=book_title)
+    return render_template('deleted.html', shishosan=config['shishosan'], title=title, isbn10=isbn10, book_title=book_title)
 
 
 @app.route('/shelf/<page>', methods=['GET', 'POST'])
+@login_required
 def shelf(page=None):
     # "GET /shelf/<page>" -> "shelf.html"のレンダリング
     page = int(page)    # ページ番号
@@ -191,10 +258,11 @@ def shelf(page=None):
 
     n_shelf = ceil(n_book / display)     # 本棚（ページ）数 -> ceil(書籍総数 / 表示数) (ceil: 天井関数)
     title = get_title('本棚 ({0}/{1})'.format(page, n_shelf))
-    return render_template('shelf.html', title=title, books=books, page=page, display=display, n_shelf=n_shelf)
+    return render_template('shelf.html', shishosan=config['shishosan'], title=title, books=books, page=page, display=display, n_shelf=n_shelf)
 
 
 @app.route('/search')
+@login_required
 def search():
     # "GET /search" -> "search.html"のレンダリング
     page = int(request.args.get('p', default=1))        # ページ番号
@@ -214,7 +282,8 @@ def search():
         # 検索KW未入力
         title = get_title('検索ワード未入力')
         search_title = '検索ワードを入力してください'
-        return render_template('search.html', title=title, search_title=search_title, q='', page=page, display=display)
+        return render_template('search.html', shishosan=config['shishosan'], title=title, search_title=search_title, q='',
+                               page=page, display=display)
 
     es = Elasticsearch('elasticsearch')
     # pページ目 -> 全登録書籍のうち，((p - 1) * 表示数)番目から(表示数)個取得
@@ -233,11 +302,12 @@ def search():
         # ヒット書籍なし
         search_title = '検索結果: {0} (0冊)'.format(q)
         q = ''  # 再検索させるため検索KWは削除しておく
-    return render_template('search.html', title=title, search_title=search_title, q=q, result=result,
-                           page=page, display=display, n_page=n_page)
+    return render_template('search.html', shishosan=config['shishosan'], title=title, search_title=search_title, q=q,
+                           result=result, page=page, display=display, n_page=n_page)
 
 
 @app.route('/book/<isbn10>')
+@login_required
 def book(isbn10=None):
     # "GET /search/<isbn10>" -> "book.html"のレンダリング
     # TODO: 未登録書籍へのアクセス対応
@@ -261,16 +331,17 @@ def book(isbn10=None):
         sim_books = None
 
     es.close()
-    return render_template('book.html', title=title, isbn10=isbn10, book=book, sim_books=sim_books)
+    return render_template('book.html', shishosan=config['shishosan'], title=title, isbn10=isbn10, book=book, sim_books=sim_books)
 
 
 @app.route('/explore')
+@login_required
 def explore():
     # "GET /explore" -> "explore.html"のレンダリング
     # TODO: 詳細検索機能
 
     title = get_title('詳細検索')
-    return render_template('explore.html', title=title)
+    return render_template('explore.html', shishosan=config['shishosan'], title=title)
 
 
 if __name__ == '__main__':

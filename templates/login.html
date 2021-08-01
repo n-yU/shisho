@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- Copyright (c) 2021 MDBootstrap
+Released under the MIT license
+https://opensource.org/licenses/mit-license.php -->
+<!-- https://github.com/mdbootstrap/bootstrap-5-login-cover-template/ -->
+
+<!-- ログインフォーム -->
+<div class="mask d-flex align-items-center h-100" style="background-color: rgba(0, 0, 0, 0.8);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-5 col-md-8 text-center bg-light rounded p-5" style="margin-top: 20px;">
+                <form action="/login" method="POST", class="form-outline">
+                    <div class="mb-4"><p style="font-size: 20px;">{{ shishosan }}のメンバーのみ閲覧できます</p></div>
+                    {% if error %}
+                    <div class="mb-4"><p class="note note-danger">{{ error }}</p></div>
+                    {% endif %}
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <!-- ユーザID -->
+                    <div class="form-outline mb-4">
+                        <input type="text" id="form1Example1" class="form-control" name="uId">
+                        <label class="form-label" for="form1Example1">ユーザID</label>
+                    </div>
+                    <!-- パスワード -->
+                    <div class="form-outline mb-4">
+                        <input type="password" id="form1Example2" class="form-control" name="password">
+                        <label class="form-label" for="form1Example2">パスワード</label>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <!-- Remember Me -->
+                        <div class="col d-flex justify-content-center">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="form1Example3" name='rmm'>
+                                <label class="form-check-label" for="form1Example3">ログイン状態を保存する</label>
+                            </div>
+                        </div>
+                        <!-- アカウント作成ページへ -->
+                        <div class="col text-center">
+                            <a href="#!">招待コード入力</a>
+                        </div>
+                    </div>
+                    <!-- ログインボタン -->
+                    <button type="submit" class="btn btn-primary btn-rounded">
+                        <i class="fas fa-sign-in-alt fa-4x"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
