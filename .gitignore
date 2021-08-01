@@ -18,3 +18,4 @@ config/books.txt
 config/config.yml
 backup
 db/data
+templates/mypage.html

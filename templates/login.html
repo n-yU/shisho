@@ -17,6 +17,7 @@ https://opensource.org/licenses/mit-license.php -->
                     <div class="mb-4"><p class="note note-danger">{{ error }}</p></div>
                     {% endif %}
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="next_url" value="{{ next_url }}">
                     <!-- ユーザID -->
                     <div class="form-outline mb-4">
                         <input type="text" id="form1Example1" class="form-control" name="uId">

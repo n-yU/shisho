@@ -88,7 +88,8 @@ def index():
 def login_form():
     # "GET /login" -> レンダリング: "login.html"
     title = get_title('ログイン')
-    return render_template('login.html', shishosan=config['shishosan'], title=title)
+    next_url = request.args.get('next', 'index')
+    return render_template('login.html', shishosan=config['shishosan'], title=title, next_url=next_url)
 
 
 @app.route('/login', methods=['POST'])
@@ -113,8 +114,7 @@ def login():
     if valid_pass:
         # パスワード一致 -> ログイン
         login_user(user, remember=(True if request.form.get('rmm') else False))
-        # return render_template(shishosan=config['shishosan'], 'mypage.html')
-        return redirect(url_for('index'))   # TODO: マイページへの遷移
+        return redirect(request.form.get('next_url'))
     elif input_password == '':
         # パスワード未入力
         title = get_title('ログイン')
