@@ -8,7 +8,7 @@ from datetime import datetime as dt
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker, relationship
 from sqlalchemy.sql.functions import current_timestamp
-from sqlalchemy import Column, String, Integer, create_engine, TIMESTAMP, text, ForeignKey
+from sqlalchemy import Column, String, Integer, create_engine, TIMESTAMP, text, ForeignKey, Boolean
 from flask_login import UserMixin
 from flask_bcrypt import Bcrypt
 
@@ -48,6 +48,7 @@ class User(Base):
     password = Column('password', String(100), nullable=False)          # パスワード
     # 最終アクティブ（最後に書籍情報を閲覧した）時刻
     active_at = Column('active_at', TIMESTAMP, server_default=current_timestamp())
+    changed_sId = Column('changed_sId', Boolean, default=True)                          # セッションID変更済フラグ
     created_at = Column('created_at', TIMESTAMP, server_default=current_timestamp())    # 作成時刻
     updated_at = Column('updated_at', TIMESTAMP, nullable=False,                        # 更新時刻
                         server_default=text('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
@@ -64,6 +65,7 @@ class History(Base):
     sId = Column('sId', String(200), nullable=False)            # セッションID
     bId = Column('bId', String(200), nullable=False)            # 書籍ID
     ts = Column('ts', TIMESTAMP, nullable=False)                # タイムスタンプ
+    isLast = Column('isLast', Boolean, default=False)           # セッション末尾書籍フラグ
 
 
 class LoginUser(UserMixin, User):
@@ -108,12 +110,13 @@ def record_history(user: LoginUser, bId: str) -> None:
     # 最終アクティブ時刻更新
     target_user = User.query.get(user.uId)
     target_user.active_at = cts
+    target_user.changed_sId = False  # AFK状態 -> 次回以降のセッション変更
     session.commit()
 
     # DEBUG:
     # for user in session.query(User).join(History, User.uId == History.uId).all():
     #     for log in user.histories:
-    #         logger.debug('{0}:{1} -> {2} ({3})'.format(log.uId, log.sId, log.bId, log.ts))
+    #         logger.debug('{0}:{1} -> {2} ({3}) ({4})'.format(log.uId, log.sId, log.bId, log.ts, log.isLast))
 
 
 def get_user_history(user: LoginUser) -> Dict[int, Dict[int, Union[int, str, dt]]]:
@@ -148,6 +151,12 @@ def change_session(user: LoginUser) -> None:
     """
     target_user = User.query.get(user.uId)
     target_user.sId = get_sId()  # セッションID変更
+    target_user.changed_sId = True  # セッション変更済
+
+    # セッション末尾ログフラグ設定
+    last_log = session.query(History).filter(History.uId == user.uId).order_by(History.ts.desc()).first()
+    last_log.isLast = True
+
     session.commit()
 
 
@@ -161,6 +170,10 @@ def update_session(change_limit_minutes: int) -> None:
     users = User.query.all()    # 全ユーザ
 
     for user in users:
+        if user.changed_sId:
+            # セッション変更済 -> 再変更しない
+            continue
+
         time_diff_minutes = (cts - user.active_at).seconds // 60    # 時間差（分単位）
         if time_diff_minutes >= change_limit_minutes:
             # 上限オーバー -> セッション変更

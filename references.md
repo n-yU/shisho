@@ -38,6 +38,11 @@
 - [Python + Flask を使ったWebアプリ作成④（ログイン認証編）](https://mmtomitomimm.blogspot.com/2019/03/4-python.html)
 - [Flask-Loginの使い方 - Qiita](https://qiita.com/msrks/items/d9c327dd81749ec01d1d)
 
+## Python
+- [Pythonを使ってランダムな文字列を生成 - Qiita](https://qiita.com/Scstechr/items/c3b2eb291f7c5b81902a)
+- [Pythonで自動ジョブを実行する - Qiita](https://qiita.com/svfreerider/items/32ecd91d402b05fb8b9a)
+- [pythonのAPSchedulerによるプログラム、関数の定期実行 - どん底から這い上がるまでの記録](https://www.pytry3g.com/entry/apscheduler)
+
 # SQL
 - [M1 MacでDockerのMySQLコンテナが立ち上がらない問題の解消法](https://ichi-station.com/docker-mysql-for-m1-mac/)
 - [MySQLをDocker(docker-compose)で立ててみた](https://outputable.com/post/mysql-on-docker/)
@@ -45,6 +50,7 @@
 - [SQLAlchemy入門 ORM その4 リレーションとJOIN | Python学習講座](https://www.python.ambitious-engineer.com/archives/1579)
 - [SQLAlchemyの基本的な使い方 - Qiita](https://qiita.com/ariku/items/75799665acd09520bed2)
 - [SQLAlchemyのSession生成方法 - Qiita](https://qiita.com/tosizo/items/86d3c60a4bb70eb1656e)
+- [SQLAlchemy ORMの基本的な使い方 - Qiita](https://qiita.com/TamaiHideaki/items/346bf843ee6ee1aa6e93)
 
 ## Front-end
 主にBootstrapです．
@@ -70,5 +76,4 @@
 ## Others
 - [著作権ケーススタディ / 日本児童文芸家協会](http://www.jidoubungei.jp/cn9/pg78565.html)
 - [ノートアイコン1 | アイコン素材ダウンロードサイト「icooon-mono」 | 商用利用可能なアイコン素材が無料(フリー)ダウンロードできるサイト](https://icooon-mono.com/12957-%e3%83%8e%e3%83%bc%e3%83%88%e3%82%a2%e3%82%a4%e3%82%b3%e3%83%b31/)
-- [Pythonを使ってランダムな文字列を生成 - Qiita](https://qiita.com/Scstechr/items/c3b2eb291f7c5b81902a)
 - [.gitignoreを後から設定し、git管理から除外する方法 - Qiita](https://qiita.com/yutosa3/items/25ab031c8061e8c9a4c4)

@@ -16,7 +16,7 @@ elasticsearch
 numpy
 pandas
 scikit-learn
-gensim
+gensim==4.0.1
 mecab-python3
 neologdn
 requests
