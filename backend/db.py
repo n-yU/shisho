@@ -45,9 +45,11 @@ class User(Base):
     uId = Column('uId', String(100), primary_key=True, nullable=False)  # ユーザID
     sId = Column('sId', String(200), nullable=False)                    # セッションID
     name = Column('name', String(200), nullable=False)                  # ユーザ名
-    password = Column('password', String(100), nullable=False)             # パスワード
-    created_at = Column('created_at', TIMESTAMP, server_default=current_timestamp())    # 作成日
-    updated_at = Column('updated_at', TIMESTAMP, nullable=False,                        # 更新日
+    password = Column('password', String(100), nullable=False)          # パスワード
+    # 最終アクティブ（最後に書籍情報を閲覧した）時刻
+    active_at = Column('active_at', TIMESTAMP, server_default=current_timestamp())
+    created_at = Column('created_at', TIMESTAMP, server_default=current_timestamp())    # 作成時刻
+    updated_at = Column('updated_at', TIMESTAMP, nullable=False,                        # 更新時刻
                         server_default=text('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
 
     histories = relationship('History', backref='users')    # Historyとのリレーション
@@ -60,8 +62,8 @@ class History(Base):
     id = Column(Integer, primary_key=True)                      # ログID
     uId = Column('uId', String(100), ForeignKey('users.uId'))   # ユーザID（ユーザテーブルとの外部キー）
     sId = Column('sId', String(200), nullable=False)            # セッションID
-    bId = Column('bId', String(200), nullable=False)                # 書籍ID
-    ts = Column('ts', TIMESTAMP, nullable=False, server_default=current_timestamp())    # タイムスタンプ
+    bId = Column('bId', String(200), nullable=False)            # 書籍ID
+    ts = Column('ts', TIMESTAMP, nullable=False)                # タイムスタンプ
 
 
 class LoginUser(UserMixin, User):
@@ -99,8 +101,13 @@ def record_history(user: LoginUser, bId: str) -> None:
     """
 
     # 履歴記録
-    log = History(uId=user.uId, sId=user.sId, bId=bId)
+    cts = dt.now()  # 現在時刻
+    log = History(uId=user.uId, sId=user.sId, bId=bId, ts=cts)
     session.add(log)
+
+    # 最終アクティブ時刻更新
+    target_user = User.query.get(user.uId)
+    target_user.active_at = cts
     session.commit()
 
     # DEBUG:
@@ -131,6 +138,33 @@ def get_user_history(user: LoginUser) -> Dict[int, Dict[int, Union[int, str, dt]
         user_history[log.id]['ts'] = log.ts
 
     return user_history
+
+
+def change_session(user: LoginUser) -> None:
+    """セッション変更
+
+    Args:
+        user (LoginUser): ログインユーザ
+    """
+    target_user = User.query.get(user.uId)
+    target_user.sId = get_sId()  # セッションID変更
+    session.commit()
+
+
+def update_session(change_limit_minutes: int) -> None:
+    """セッション更新（変更有無確認）
+
+    Args:
+        change_limit_minutes (int): セッション変更上限時刻（現在時刻と最終アクティブ時刻の差）
+    """
+    cts = dt.now()              # 現在時刻
+    users = User.query.all()    # 全ユーザ
+
+    for user in users:
+        time_diff_minutes = (cts - user.active_at).seconds // 60    # 時間差（分単位）
+        if time_diff_minutes >= change_limit_minutes:
+            # 上限オーバー -> セッション変更
+            change_session(user=user)
 
 
 def main():

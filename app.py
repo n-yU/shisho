@@ -1,18 +1,19 @@
 from logging import getLogger, StreamHandler, DEBUG, Formatter
 from math import ceil
 from pathlib import Path
+import os
 from elasticsearch import Elasticsearch
 import MeCab
-import os
 
 from flask import Flask, render_template, request, redirect, url_for
 from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from flask_bcrypt import Bcrypt
 
+from backend.schedule import run_schedule
 from backend.openbd import OpenBD
 from backend.doc2vecwrapper import Doc2VecWrapper
-from backend.db import LoginUser, record_history, get_user_history
+from backend.db import LoginUser, record_history, get_user_history, change_session
 from config import get_config
 
 
@@ -39,6 +40,8 @@ login_manager.login_view = 'login'          # ログインページ
 app.config['SECRET_KEY'] = os.urandom(24)   # セッション情報暗号化
 csrf = CSRFProtect(app)                     # flask-wtfによるCSRF対策
 bcrypt = Bcrypt(app)                        # flask-bcryptパスワードハッシュ化
+
+run_schedule()  # 定期実行ジョブのスケジューリング
 
 
 @login_manager.user_loader
@@ -88,7 +91,7 @@ def index():
 def login_form():
     # "GET /login" -> レンダリング: "login.html"
     title = get_title('ログイン')
-    next_url = request.args.get('next', 'index')
+    next_url = request.args.get('next', '/')
     return render_template('login.html', shishosan=config['shishosan'], title=title, next_url=next_url)
 
 
@@ -162,7 +165,8 @@ def history():
 @login_required
 def logout():
     # "GET /logout" -> ログアウト処理
-    logout_user()
+    change_session(user=current_user)   # セッション変更
+    logout_user()                       # ログアウト
     return redirect(url_for('login'))
 
 
