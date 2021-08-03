@@ -51,6 +51,7 @@
 - [SQLAlchemyの基本的な使い方 - Qiita](https://qiita.com/ariku/items/75799665acd09520bed2)
 - [SQLAlchemyのSession生成方法 - Qiita](https://qiita.com/tosizo/items/86d3c60a4bb70eb1656e)
 - [SQLAlchemy ORMの基本的な使い方 - Qiita](https://qiita.com/TamaiHideaki/items/346bf843ee6ee1aa6e93)
+- [SQLAlchemy から Pandas にデータを読み込む - Qiita](https://qiita.com/propella/items/6480f6c8ef612cd2283e)
 
 ## Front-end
 主にBootstrapです．
@@ -71,7 +72,8 @@
 - [[gensim]Doc2Vecの使い方](https://qiita.com/asian373asian/items/1be1bec7f2297b8326cf)
 - [Doc2Vecについてまとめる](https://qiita.com/g-k/items/5ea94c13281f675302ca)
 - [文章の前処理・分かち書きを行い文書ベクトルを算出](https://qiita.com/minamoto_user/items/af0b3ff3518f7fbd7bce)
-- [gensim.models.Doc2Vec](https://tedboy.github.io/nlps/generated/generated/gensim.models.Doc2Vec.html)
+- [models.Doc2Vec - Doc2vec paragraph embeddings - gensim](https://radimrehurek.com/gensim/models/doc2vec.html)
+- [models.keyedvectors - Store and query word vectors - gensim](https://radimrehurek.com/gensim/models/keyedvectors.html)
 
 ## Others
 - [著作権ケーススタディ / 日本児童文芸家協会](http://www.jidoubungei.jp/cn9/pg78565.html)

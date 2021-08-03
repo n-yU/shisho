@@ -2,3 +2,15 @@ shishosan: XYZ研究室
 admin_user_id: admin
 admin_user_name: admin_name
 admin_user_password: admin_password
+guest_user_password: guest_password
+sbrs:
+  session_rep:
+    update_method: cos
+  user_rep:
+    context_size: 5
+  rtuser_rep:
+    construct_method: sum-user
+  search:
+    method: cf
+    k_book: 6
+    k_user: 5

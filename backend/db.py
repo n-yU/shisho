@@ -4,6 +4,8 @@ import sys
 from pathlib import Path
 import random
 import string
+import pandas as pd
+import numpy as np
 from datetime import datetime as dt
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker, relationship
@@ -94,7 +96,7 @@ def get_sId(n=12) -> str:
     return ''.join(random.choices(string.ascii_letters + string.digits, k=n))
 
 
-def record_history(user: LoginUser, bId: str) -> None:
+def record_history(user: LoginUser, bId: str) -> History:
     """書籍閲覧履歴記録
 
     Args:
@@ -117,6 +119,8 @@ def record_history(user: LoginUser, bId: str) -> None:
     # for user in session.query(User).join(History, User.uId == History.uId).all():
     #     for log in user.histories:
     #         logger.debug('{0}:{1} -> {2} ({3}) ({4})'.format(log.uId, log.sId, log.bId, log.ts, log.isLast))
+
+    return log  # historiesテーブル記録ログ
 
 
 def get_user_history(user: LoginUser) -> Dict[int, Dict[int, Union[int, str, dt]]]:
@@ -143,7 +147,18 @@ def get_user_history(user: LoginUser) -> Dict[int, Dict[int, Union[int, str, dt]
     return user_history
 
 
-def change_session(user: LoginUser) -> None:
+def get_history_df() -> pd.core.frame.DataFrame:
+    """書籍情報閲覧履歴をデータフレームに変換して取得
+
+    Returns:
+        pd.core.frame.DataFrame: データフレーム形式 書籍情報閲覧履歴
+    """
+    sql = "SELECT * FROM histories"                                     # 書籍情報 全閲覧履歴
+    history_df = pd.read_sql_query(sql=sql, con=ENGINE, index_col='id')  # SQLからデータフレーム読み込み
+    return history_df
+
+
+def change_session(user: LoginUser) -> History:
     """セッション変更
 
     Args:
@@ -154,10 +169,11 @@ def change_session(user: LoginUser) -> None:
     target_user.changed_sId = True  # セッション変更済
 
     # セッション末尾ログフラグ設定
-    last_log = session.query(History).filter(History.uId == user.uId).order_by(History.ts.desc()).first()
+    last_log = History.query.filter(History.uId == user.uId).order_by(History.ts.desc()).first()
     last_log.isLast = True
-
     session.commit()
+
+    return last_log
 
 
 def update_session(change_limit_minutes: int) -> None:
@@ -180,6 +196,44 @@ def update_session(change_limit_minutes: int) -> None:
             change_session(user=user)
 
 
+def insert_user_and_history_for_debug() -> None:
+    """デバッグ用ユーザ/閲覧履歴のDB各テーブルへの挿入
+    """
+    from elasticsearch import Elasticsearch
+
+    def get_random_bId() -> str:
+        """書籍ID（ISBN-10）のランダム習得
+
+        Returns:
+            str: 書籍ID（ISBN-10）
+        """
+        es = Elasticsearch('elasticsearch')
+        es_params = {'size': 1}
+        body = {'query': {'function_score': {"query": {"match_all": {}}, "random_score": {}}}}
+        bId = es.search(index='book', body=body, params=es_params)['hits']['hits'][0]['_source']['isbn10']
+        es.close()
+        return bId
+
+    config = get_config()                                   # 司書設定
+    guest_uIds = ['g{0}'.format(ix) for ix in range(1, 5)]  # ゲストユーザID
+
+    for uIx, uId in enumerate(guest_uIds):
+        # ゲストユーザアカウント追加
+        user = LoginUser(uId=uId, sId=get_sId(), name='Guest {0}'.format(uIx),
+                         password=Bcrypt().generate_password_hash(config['guest_user_password']).decode('utf-8'))
+        session.add(user)
+
+        # 閲覧履歴生成（セッション数・各セッションサイズは乱数）
+        for _ in range(np.random.randint(2, 6)):
+            sSize = np.random.randint(1, 5)  # セッションサイズ
+            for i in range(sSize):
+                session.add(History(uId=uId, sId=User.query.get(user.sId), bId=get_random_bId(), ts=dt.now(),
+                                    isLast=(True if (i == sSize - 1) else False)))  # 閲覧履歴追加
+            change_session(user=user)   # セッション変更
+
+    session.commit()
+
+
 def main():
     """全テーブル初期化
     """
@@ -190,8 +244,10 @@ def main():
     # 管理者アカウント作成
     admin_user = LoginUser(uId=config['admin_user_id'], sId=get_sId(), name=config['admin_user_name'],
                            password=Bcrypt().generate_password_hash(config['admin_user_password']).decode('utf-8'))
-    session.add(admin_user)    # INSERT: 管理者アカウント
-    session.commit()        # テーブル更新
+    session.add(admin_user)     # INSERT: 管理者アカウント
+    session.commit()            # テーブル更新
+
+    insert_user_and_history_for_debug()     # デバッグ用ユーザ/閲覧履歴のDB各テーブルへの挿入
 
 
 if __name__ == "__main__":

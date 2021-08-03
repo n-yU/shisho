@@ -74,10 +74,10 @@
         <!-- 書籍推薦 -->
         <div class="col-md-7 my-3 bg-light">
             {% if sim_books %}
-            <!-- 非パーソナライズ推薦（類似書籍） -->
+            <!-- 非パーソナライズ推薦（Doc2Vecによる類似性判断） -->
             <div class="row mt-4 align-items-center">
                 <div class="col-md-12 text-left mb-3">
-                    <h3>似ている本</h3>
+                    <h3>似ている書籍</h3>
                 </div>
                 {% for sb in sim_books %}
                 <div class="col-sm-2 mb-5 col-4">
@@ -100,30 +100,32 @@
             </div>
             {% endif %}
 
-            <!-- パーソナライズ推薦（未実装 <- 提案システム導入予定） -->
+            {% if rec_books %}
+            <!-- パーソナライズ推薦（提案システム導入） -->
             <div class="row mt-4 align-items-center bg-light">
                 <div class="col-md-12 text-left mb-3">
-                    <h3>あなたにオススメ（準備中）</h3>
+                    <h3>あなたへのオススメ書籍</h3>
                 </div>
-                {% for i in range(6) %}
+                {% for rb in rec_books %}
                 <div class="col-sm-2 mb-5 col-4">
-                    {% if book.cover %}
+                    {% if rb.cover %}
                     <!-- 表紙画像あり -->
-                    <a class="ripple" href="/book/{{ book.isbn10 }}">
-                        <img src="{{ book.cover }}" class="img-fluid shadow-2-strong" alt="" />
+                    <a class="ripple" href="/book/{{ rb.isbn10 }}">
+                        <img src="{{ rb.cover }}" class="img-fluid shadow-2-strong" alt="" />
                     </a>
                     {% else %}
                     <!-- 表紙画像なし -->
-                    <a class="card bg-light" href="/book/{{ book.isbn10 }}">
+                    <a class="card bg-light" href="/book/{{ rb.isbn10 }}">
                         <img src="../static/img/book.png" class="img-fluid" alt="" />
                         <div class="card-img-overlay" style="padding: 0.5rem 1rem;">
-                            <p style="font-size: 0.5rem;">{{ book.title }}</p>
+                            <p style="font-size: 0.5rem;">{{ rb.title }}</p>
                         </div>
                     </a>
                     {% endif %}
                 </div>
                 {% endfor %}
             </div>
+            {% endif %}
         </div>
     </div>
 </div>

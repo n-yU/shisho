@@ -14,6 +14,7 @@ from backend.schedule import run_schedule
 from backend.openbd import OpenBD
 from backend.doc2vecwrapper import Doc2VecWrapper
 from backend.db import LoginUser, record_history, get_user_history, change_session
+from backend.sbrs import get_prop_sbrs
 from config import get_config
 
 
@@ -41,7 +42,8 @@ app.config['SECRET_KEY'] = os.urandom(24)   # セッション情報暗号化
 csrf = CSRFProtect(app)                     # flask-wtfによるCSRF対策
 bcrypt = Bcrypt(app)                        # flask-bcryptパスワードハッシュ化
 
-run_schedule()  # 定期実行ジョブのスケジューリング
+prop_sbrs = get_prop_sbrs(d2v=d2v)  # 提案SBRS
+run_schedule()                      # 定期実行ジョブのスケジューリング
 
 
 @login_manager.user_loader
@@ -212,12 +214,12 @@ def register_post():
     n_book = es.count(index='book')['count']    # 登録書籍総数
     es.close()
 
-    # 書籍総数が10の倍数 -> Doc2Vecモデル再構築
-    # configで弄れるようにする予定
+    # 書籍総数が10の倍数（TODO: 値はconfigで弄れるようにする）
     if n_book % 10 == 0:
-        global d2v
+        global d2v, prop_sbrs
         d2v = Doc2VecWrapper(model_path=Path('/projects/model/d2v.model'), initialize=True)
-        d2v.train()
+        d2v.train()                         # Doc2Vecモデル再構築
+        prop_sbrs = get_prop_sbrs(d2v=d2v)  # 提案システム再構築
 
     return render_template('registered.html', shishosan=config['shishosan'], title=title, isbn10=isbn10, book_info=book_info)
 
@@ -344,8 +346,8 @@ def search():
 @login_required
 def book(isbn10=None):
     # "GET /search/<isbn10>" -> "book.html"のレンダリング
-    # TODO: 未登録書籍へのアクセス対応
-    # TODO: D2Vモデル訓練データ外書籍へのアクセス対応
+    # 類似書籍: 非パーソナライズ推薦（Doc2Vec）による書籍
+    # 推薦書籍: パーソナライズ推薦（提案SBRS）による書籍
 
     title = get_title('本:{0}'.format(isbn10))
 
@@ -356,7 +358,7 @@ def book(isbn10=None):
     if n_book >= 10:
         # 10冊以上 -> D2Vモデル構築済み -> 非パーソナライズ推薦（類似書籍取得）
         try:
-            sim_books_isbn10 = d2v.get_similar_books(isbn10=isbn10, topn=6, verbose=False)  # 類似書籍ISBN-10コード
+            sim_books_isbn10 = d2v.get_similar_books(isbn10=isbn10, topn=6, verbose=False)  # 類似書籍ISBN-10
             sim_books = [es.get_source(index='book', id=sb[0]) for sb in sim_books_isbn10]  # 類似書籍情報取得
         except KeyError:
             # 分散表現未構築（モデル再構築前） -> 非パーソナライズ推薦キャンセル
@@ -364,10 +366,19 @@ def book(isbn10=None):
     else:
         sim_books = None
 
+    log = record_history(user=current_user, bId=isbn10)     # 書籍閲覧履歴記録
+    rec_books_isbn10 = prop_sbrs.update(log=log)            # 推薦書籍ISBN-10
+
+    # 推薦書籍なし（各情報不足により提案SBRSが推薦生成できず） -> 類似書籍のみ表示
+    if rec_books_isbn10 is None:
+        rec_books = None
+    else:
+        # ISBN-10に対応する書籍情報習得
+        rec_books = [es.get_source(index='book', id=isbn10) for isbn10 in rec_books_isbn10]
     es.close()
 
-    record_history(user=current_user, bId=isbn10)   # 書籍閲覧履歴記録
-    return render_template('book.html', shishosan=config['shishosan'], title=title, isbn10=isbn10, book=book, sim_books=sim_books)
+    return render_template('book.html', shishosan=config['shishosan'], title=title, isbn10=isbn10, book=book,
+                           sim_books=sim_books, rec_books=rec_books)
 
 
 @app.route('/explore')

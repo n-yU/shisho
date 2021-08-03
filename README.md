@@ -1,5 +1,5 @@
 # shisho
-**(2021.05.28現在) 開発中のため正常な動作は保証していません．使用はご遠慮ください．**
+**(2021.08.03現在) 開発中のため正常な動作は保証していません．使用はご遠慮ください．**
 
 ![ライセンス](https://img.shields.io/github/license/n-yU/shisho)
 ![コードサイズ](https://img.shields.io/github/languages/code-size/n-yU/shisho)
@@ -10,7 +10,7 @@
 - 書籍の検索には全文検索エンジンのElasticsearchを使用しています．
 - Webアプリ構築にはflaskを使っています．
 - Doc2Vec(Paragraph2Vec[Le+, 2014])を活用した非パーソナライズ推薦機能が実装されてます．
-- 提案システム[梛木+, 2020]を活用したパーソナライズ推薦機能を実装予定です．
+- **自身の研究開発により提案したセッションベース推薦システム（SBRS: Session-based Recommender Systems）[梛木+, 2021]を活用したパーソナライズ推薦機能が実装されてます．**
     - ただし，書籍（アイテム）の分散表現構築にはItem2Vec[Barkan+, 2016]ではなくDoc2Vecを使用しています．
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -107,13 +107,15 @@
 
 
 ## 📚 参考
-- 参考サイト: [references.md](./references.md) にまとめています
+- 開発において参考にしたブログ記事やドキュメント等は [references.md](./references.md) にまとめています
 - 文献
     - [Le+, 2014]: Q. Le, T. Mikolov: Distributed Representations of Sentences and Documents, Proc. of the 31st Int. Conf. on Machine Learning, pp.1188–1196,2014.
-    - [梛木+, 2020] 梛木 佑真, 岡本 一志: アイテム分散表現の階層化・集約演算に基づくセッションベース推薦システム, Webインテリジェンスとインタラクション研究会 第16回研究会予稿集, 56-59, 2020.
+    - [梛木+, 2021] 梛木 佑真, 岡本 一志: 分散表現を用いたリアルタイム学習型セッションベース推薦システム,人工知能学会全国大会論文集 , 1I2-GS-4a-05, 2021.
+        - [原稿 (J-Stage)](https://www.jstage.jst.go.jp/article/pjsai/JSAI2021/0/JSAI2021_1I2GS4a05/_article/-char/ja/)
+        - [スライド (slideshare)](https://www.slideshare.net/okamoto-laboratory/ss-249413663)
     - [Barkan+, 2016]: O. Barkan, N. Koenigstein: Item2Vec: Neural Item Embedding for Collaborative Filtering, In 2016 IEEE 26th Int. Workshop on Machine Learning for Signal Processing (MLSP), pp.1–6, 2016.
 
 
 ## ☎️ お問い合わせ
-- 本リポジトリについて質問等ありましたら，[Twitter](https://twitter.com/nyu923)へのリプライが最も反応が早いです（DMはご遠慮ください）．
+- 本リポジトリについて質問等ございましたら，[Twitter](https://twitter.com/nyu923)へのリプライが最も反応が早いです（DMはご遠慮ください）．
 - 必要に応じてイシューを立てて頂いても結構です（現在は初期開発段階ですのでご遠慮ください）．

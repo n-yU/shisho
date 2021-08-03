@@ -9,12 +9,13 @@ from backend.db import update_session
 def job_update_session() -> None:
     """セッション更新ジョブ
     """
-    update_session(change_limit_minutes=15)
+    # TODO: セッションが変更されたユーザのユーザ表現更新 (circular importをどう回避するか)
+    update_session(change_limit_minutes=1)
 
 
 def run_schedule() -> None:
     """定期実行ジョブのスケジューリング
     """
     sched = BackgroundScheduler(standalone=True, coalesce=True)
-    sched.add_job(job_update_session, 'interval', minutes=15)    # セッション更新
+    sched.add_job(job_update_session, 'interval', minutes=1)    # セッション更新
     sched.start()
