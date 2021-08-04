@@ -6,16 +6,26 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
 
-- [📷 イメージ](#-%E3%82%A4%E3%83%A1%E3%83%BC%E3%82%B8)
-  - [トップページ](#%E3%83%88%E3%83%83%E3%83%97%E3%83%9A%E3%83%BC%E3%82%B8)
-  - [書籍個別ページ](#%E6%9B%B8%E7%B1%8D%E5%80%8B%E5%88%A5%E3%83%9A%E3%83%BC%E3%82%B8)
-- [🔍 環境](#-%E7%92%B0%E5%A2%83)
-- [📂 ディレクトリ構成](#-%E3%83%87%E3%82%A3%E3%83%AC%E3%82%AF%E3%83%88%E3%83%AA%E6%A7%8B%E6%88%90)
-- [🚀 セットアップ](#-%E3%82%BB%E3%83%83%E3%83%88%E3%82%A2%E3%83%83%E3%83%97)
-- [📚 参考](#-%E5%8F%82%E8%80%83)
-- [☎️ お問い合わせ](#-%E3%81%8A%E5%95%8F%E3%81%84%E5%90%88%E3%82%8F%E3%81%9B)
+<p align="center">
+<a href="#-%E3%83%9D%E3%82%A4%E3%83%B3%E3%83%88">✅ ポイント</a>
+<span>|</span>
+<a href="#-%E4%BB%8A%E5%BE%8C%E3%81%AE%E4%BA%88%E5%AE%9A">📅 今後の予定</a>
+<span>|</span>
+<a href="#-%E3%83%87%E3%83%A2">🎮 デモ</a>
+<span>|</span>
+<a href="#-%E3%82%A4%E3%83%A1%E3%83%BC%E3%82%B8">📷 イメージ</a>
+<span>|</span>
+<a href="#-%E7%92%B0%E5%A2%83">🔍 環境</a>
+<span>|</span>
+<a href="#-%E3%83%87%E3%82%A3%E3%83%AC%E3%82%AF%E3%83%88%E3%83%AA%E6%A7%8B%E6%88%90">📂 ディレクトリ構成</a>
+<span>|</span>
+<a href="#-%E3%82%BB%E3%83%83%E3%83%88%E3%82%A2%E3%83%83%E3%83%97">🚀 セットアップ</a>
+<span>|</span>
+<a href="#-%E5%8F%82%E8%80%83">📚 参考</a>
+<span>|</span>
+<a href="#-%E3%81%8A%E5%95%8F%E3%81%84%E5%90%88%E3%82%8F%E3%81%9B">☎️ お問い合わせ</a>
+</p>
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
