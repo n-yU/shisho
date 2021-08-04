@@ -36,7 +36,7 @@ class Doc2VecWrapper():
             self.__load_model()
 
         # MeCab設定: NEologd（MeCab用システム辞書）を使った分かち書き
-        self.mecab = MeCab.Tagger('-Ochasen -r /etc/mecabrc -d /usr/lib/aarch64-linux-gnu/mecab/dic/mecab-ipadic-neologd')
+        self.mecab = MeCab.Tagger('-Ochasen -r /etc/mecabrc -d /usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd')
 
     def __load_model(self) -> None:
         """モデル読み込み

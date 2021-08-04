@@ -13,7 +13,7 @@ from flask_bcrypt import Bcrypt
 from backend.schedule import run_schedule
 from backend.openbd import OpenBD
 from backend.doc2vecwrapper import Doc2VecWrapper
-from backend.db import LoginUser, record_history, get_user_history, change_session
+from backend.db import LoginUser, record_history, get_user_history, change_session, get_guest_uIds
 from backend.sbrs import get_prop_sbrs
 from config import get_config
 
@@ -30,9 +30,10 @@ handler.setFormatter(Formatter('[shisho] %(message)s'))
 
 config = get_config()   # 司書設定
 # MeCab設定: NEologd（MeCab用システム辞書）を使った分かち書き
-mecab = MeCab.Tagger('-Ochasen -r /etc/mecabrc -d /usr/lib/aarch64-linux-gnu/mecab/dic/mecab-ipadic-neologd')
+mecab = MeCab.Tagger('-Ochasen -r /etc/mecabrc -d /usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd')
 # Doc2Vecモデル読み込み（パスが存在しない -> 未訓練状態）
 d2v = Doc2VecWrapper(model_path=Path('/projects/model/d2v.model'))
+guest_uIds_set = set(get_guest_uIds())  # ゲストアカウント ユーザID集合
 
 login_manager = LoginManager()
 app = Flask(__name__)   # Flaskインスタンスをappという名前で生成
@@ -189,6 +190,9 @@ def register_inquire():
     book = OpenBD(isbn10=isbn10, mecab=mecab)   # openBDリクエスト
     result = book.result                      # リクエスト結果
 
+    if current_user.uId in guest_uIds_set:
+        result = 'GUEST USER'
+
     if result == 'OK':
         # 書籍情報取得成功 -> 書籍基本情報送信
         book_info = book.get_std_info()  # 書籍基本情報
@@ -228,7 +232,7 @@ def register_post():
 @login_required
 def delete_inquire():
     # "GET /delete" -> "delete.html"のレンダリング
-    if request.args.get('isbn10'):
+    if request.args.get('isbn10') and current_user.uId not in guest_uIds_set:
         # 本ページの削除ボタンからのアクセス
         title = get_title('削除確認')
         isbn10 = request.args['isbn10']  # 削除対象書籍ISBN-10コード
@@ -392,4 +396,4 @@ def explore():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=80, debug=True)

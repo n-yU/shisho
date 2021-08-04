@@ -6,6 +6,7 @@
     <h4 class="mb-4">1. ISBN-10で検索</h4>
     <form class="d-flex justify-content-center mb-4" action='/register' method='POST'>
         <div class="form-outline w-auto">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="search" id="form1" class="form-control" name='isbn10'
                 value='{% if isbn10 %}{{ isbn10 }}{% endif %}' />
             <label class="form-label" for="form1">ISBN-10</label>
@@ -44,6 +45,7 @@
                             {% if result == 'OK' %}検索結果が見つかりました
                             {% elif result == 'FAILED' %}書籍情報取得サーバーに何らかの問題が発生しています
                             {% elif result == 'NOT FOUND' %}指定したISBN-10に該当する書籍は見つかりません
+                            {% elif result == 'GUEST USER' %}ゲストユーザは書籍を登録できません
                             {% else %}不明なエラーです
                             {% endif %}
                         </td>

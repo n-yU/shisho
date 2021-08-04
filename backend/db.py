@@ -1,5 +1,5 @@
 from logging import getLogger, StreamHandler, DEBUG, Formatter
-from typing import Dict, Union
+from typing import Dict, Union, List
 import sys
 from pathlib import Path
 import random
@@ -196,6 +196,11 @@ def update_session(change_limit_minutes: int) -> None:
             change_session(user=user)
 
 
+def get_guest_uIds() -> List[str]:
+    guest_uIds = list(get_config()['user']['guest'].keys())
+    return guest_uIds
+
+
 def insert_user_and_history_for_debug() -> None:
     """デバッグ用ユーザ/閲覧履歴のDB各テーブルへの挿入
     """
@@ -214,21 +219,24 @@ def insert_user_and_history_for_debug() -> None:
         es.close()
         return bId
 
-    config = get_config()                                   # 司書設定
-    guest_uIds = ['g{0}'.format(ix) for ix in range(1, 5)]  # ゲストユーザID
+    config = get_config()                   # 司書設定
+    guest_config = config['user']['guest']  # ゲストユーザ設定
+    guest_uIds = get_guest_uIds()           # ゲストユーザID
 
     for uIx, uId in enumerate(guest_uIds):
         # ゲストユーザアカウント追加
-        user = LoginUser(uId=uId, sId=get_sId(), name='Guest {0}'.format(uIx),
-                         password=Bcrypt().generate_password_hash(config['guest_user_password']).decode('utf-8'))
+        user = LoginUser(uId=uId, sId=get_sId(), name=guest_config[uId]['name'],
+                         password=Bcrypt().generate_password_hash(guest_config[uId]['password']).decode('utf-8'))
         session.add(user)
+        session.commit()
 
         # 閲覧履歴生成（セッション数・各セッションサイズは乱数）
         for _ in range(np.random.randint(2, 6)):
             sSize = np.random.randint(1, 5)  # セッションサイズ
             for i in range(sSize):
-                session.add(History(uId=uId, sId=User.query.get(user.sId), bId=get_random_bId(), ts=dt.now(),
+                session.add(History(uId=uId, sId=User.query.get(user.uId).sId, bId=get_random_bId(), ts=dt.now(),
                                     isLast=(True if (i == sSize - 1) else False)))  # 閲覧履歴追加
+            session.commit()
             change_session(user=user)   # セッション変更
 
     session.commit()
@@ -242,8 +250,8 @@ def main():
     Base.metadata.create_all(bind=ENGINE)   # 全テーブル作成
 
     # 管理者アカウント作成
-    admin_user = LoginUser(uId=config['admin_user_id'], sId=get_sId(), name=config['admin_user_name'],
-                           password=Bcrypt().generate_password_hash(config['admin_user_password']).decode('utf-8'))
+    admin_user = LoginUser(uId=config['user']['admin']['id'], sId=get_sId(), name=config['user']['admin']['name'],
+                           password=Bcrypt().generate_password_hash(config['user']['admin']['password']).decode('utf-8'))
     session.add(admin_user)     # INSERT: 管理者アカウント
     session.commit()            # テーブル更新
 

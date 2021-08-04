@@ -1,7 +1,7 @@
 # 参考サイト
 大変多くのサイトを参考にしています．この場でまとめて感謝申し上げます．
 
-まずQiitaで検索かける癖があるのでQiitaの記事が多めです．
+まずQiitaで検索かける傾向があるのでQiitaの記事が多めです．
 
 ## Idea
 本リポジトリがアイデアとして参考にしたものです．
@@ -75,7 +75,12 @@
 - [models.Doc2Vec - Doc2vec paragraph embeddings - gensim](https://radimrehurek.com/gensim/models/doc2vec.html)
 - [models.keyedvectors - Store and query word vectors - gensim](https://radimrehurek.com/gensim/models/keyedvectors.html)
 
+
+## Server
+- [Flask+WSGI+NginxでサーバーをDocker上で動かすメモ](https://www.nogawanogawa.work/entry/flask_wsgi_nginx)
+
 ## Others
 - [著作権ケーススタディ / 日本児童文芸家協会](http://www.jidoubungei.jp/cn9/pg78565.html)
 - [ノートアイコン1 | アイコン素材ダウンロードサイト「icooon-mono」 | 商用利用可能なアイコン素材が無料(フリー)ダウンロードできるサイト](https://icooon-mono.com/12957-%e3%83%8e%e3%83%bc%e3%83%88%e3%82%a2%e3%82%a4%e3%82%b3%e3%83%b31/)
 - [.gitignoreを後から設定し、git管理から除外する方法 - Qiita](https://qiita.com/yutosa3/items/25ab031c8061e8c9a4c4)
+- [git cloneするときに「server certificate verification failed. CAfile: none CRLfile: none」エラーが発生した - muoilog](https://muoilog.xyz/web-development/git-clone-server-certificate-error/)

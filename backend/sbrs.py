@@ -227,7 +227,7 @@ class ProposalUser():
             # 現在のセッションIDと最新セッション表現と対応するIDが異なる -> 新規セッション -> セッション表現構築
             self.sIds.append(sId)
             self.session_reps[sId] = book_rep.copy()    # 出現書籍表現により構築
-            logger.debug('sId:{0}/bId:{1} -> Construct session rep.'.format(sId, bId))
+            logger.debug('uId:{0}/sId:{1}/bId:{2} -> Construct session rep.'.format(self.uId, sId, bId))
         else:
             # セッション表現更新
             srep_cm = self.params['session_rep']['update_method']    # セッション表現更新法
@@ -249,7 +249,7 @@ class ProposalUser():
                 logger.exception('指定したセッション表現構築法"{}"は未定義です'.format(srep_cm))
 
             self.session_reps[self.latest_sId] = updated_session_rep    # セッション表現更新
-            logger.debug('sId:{0}/bId:{1} -> Update session rep.'.format(sId, bId))
+            logger.debug('uId:{0}/sId:{1}/bId:{2} -> Update session rep.'.format(self.uId, sId, bId))
 
         return True
 
@@ -272,7 +272,7 @@ class ProposalUser():
             # 構築済ユーザ表現数増加（ただし2以上） -> ユーザKNNモデル再構築
             if self.prop_sys.n_constructed_user > 1:
                 self.prop_sys.construct_user_knn_model()
-            logger.debug('sId:{0} -> Construct user rep.'.format(sId))
+            logger.debug('uId:{0}/sId:{0} -> Construct user rep.'.format(self.uId, sId))
         else:
             # ユーザ表現更新
             context_size = self.params['user_rep']['context_size']  # コンテキストセッション数
@@ -293,7 +293,7 @@ class ProposalUser():
 
             updated_user_rep = weighted_rep_sum / weight_sum    # コンテキストセッション表現の加重平均によるユーザ表現計算
             self.user_rep = updated_user_rep.copy()             # ユーザ表現更新
-            logger.debug('sId:{0} -> Update user rep.'.format(sId))
+            logger.debug('uId:{0}/sId:{1} -> Update user rep.'.format(self.uId, sId))
 
         return True
 
@@ -323,7 +323,7 @@ class ProposalUser():
         else:
             logger.exception('指定したリアルタイムユーザ表現構築法"{0}"は未定義です'.format(rturep_cm))
 
-        logger.debug('Construct rtuser rep.')
+        logger.debug('uId:{0} -> Construct rtuser rep.'.format(self.uId))
         return rtuser_rep
 
     def search_recommended_books(self, log: History) -> np.ndarray:
