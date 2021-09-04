@@ -17,7 +17,19 @@ RUN apt-get install -y \
     mecab \
     mecab-ipadic-utf8
 
+# SSH関連
+RUN apt-get install -y ssh && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir /var/run/sshd && \
+    echo 'root:password' | chpasswd && \
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config # 
+WORKDIR /root/.ssh
+COPY ./.ssh/id_rsa.pub authorized_keys
+EXPOSE 22
+
 # ロケール設定
+WORKDIR /
 ENV LANG ja_JP.UTF-8
 ENV LANGUAGE ja_JP:ja
 ENV LC_ALL ja_JP.UTF-8
@@ -39,3 +51,5 @@ COPY . $project_dir
 WORKDIR $project_dir
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
+
+CMD ["/usr/sbin/sshd", "-D"]

@@ -20,6 +20,7 @@
 - [dockerで形態素解析の環境構築（jupyter + mecab）](https://qiita.com/rasyo/items/9756b1a7bb739bec319a)
 - [Flaskでツイート自動生成Webアプリ作ってみた](https://qiita.com/sanma_ow/items/bc75e4cc21b80feb0500)
 - [DockerでMeCab / Word2Vecの環境を構築する](https://blog.70-10.net/2020/12/27/docker-mecab-word2vec/)
+- [リモートマシンのDockerコンテナにVSCodeで接続して開発するための環境づくり](https://k-hyoda.hatenablog.com/entry/2020/11/29/180943)
 
 ## Elasticsearch
 - [はじめての Elasticsearch](https://qiita.com/nskydiving/items/1c2dc4e0b9c98d164329)

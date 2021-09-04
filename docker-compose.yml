@@ -51,6 +51,7 @@ services:
         ports:
             - "5000:5000"
             - "80:80"
+            - "8022:22"
         tty: true
         environment:
             TZ: Asia/Tokyo
