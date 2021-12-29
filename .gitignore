@@ -20,3 +20,4 @@ backup
 db/data
 templates/mypage.html
 .ssh
+.env

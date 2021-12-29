@@ -1,11 +1,15 @@
+from config import get_config
 from logging import getLogger, StreamHandler, DEBUG, Formatter
 from typing import Dict, Union, List
-import sys
 from pathlib import Path
+
+import sys
+import os
 import random
 import string
 import pandas as pd
 import numpy as np
+
 from datetime import datetime as dt
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker, relationship
@@ -16,7 +20,6 @@ from flask_bcrypt import Bcrypt
 
 parent_dir = str(Path(__file__).parent.parent.resolve())
 sys.path.append(parent_dir)
-from config import get_config
 
 # ロガー設定
 logger = getLogger(__name__)
@@ -28,8 +31,8 @@ logger.propagate = False
 handler.setFormatter(Formatter('[shisho] %(message)s'))
 
 DATABASE = 'mysql://{0}:{1}@{2}/{3}?charset=utf8mb4'.format(
-    'test', 'test', 'mysql:3306', 'app')    # TODO: 環境変数から参照
-
+    os.environ['MYSQL_USER'], os.environ['MYSQL_PASSWORD'], 'mysql:3306', os.environ['MYSQL_DATABASE']
+)
 ENGINE = create_engine(DATABASE, convert_unicode=True, echo=True)   # DBエンジン作成
 session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=ENGINE))  # scoped_sessionによるセッション生成
 

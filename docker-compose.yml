@@ -10,6 +10,12 @@ services:
             - cluster.name=elasticsearch
             - bootstrap.memory_lock=true
             - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        environment:
+            MYSQL_DATABASE: ${DATABASE}
+            MYSQL_USER: ${USERNAME}
+            MYSQL_PASSWORD: ${USERPASS}
+            MYSQL_ROOT_PASSWORD: ${ROOTPASS}
+            TZ: 'Asia/Tokyo'
         ulimits:
             memlock:
                 soft: -1
@@ -28,10 +34,10 @@ services:
         container_name: mysql
         platform: linux/x86_64
         environment:
-            MYSQL_ROOT_PASSWORD: root
-            MYSQL_DATABASE: app
-            MYSQL_USER: test
-            MYSQL_PASSWORD: test
+            MYSQL_DATABASE: ${DATABASE}
+            MYSQL_USER: ${USERNAME}
+            MYSQL_PASSWORD: ${USERPASS}
+            MYSQL_ROOT_PASSWORD: ${ROOTPASS}
             TZ: 'Asia/Tokyo'
         volumes:
             - ./db/data:/var/lib/mysql 
